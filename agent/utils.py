@@ -1,4 +1,5 @@
-import yaml, re
+import yaml
+import re
 from rich.console import Console
 from rich.syntax import Syntax
 

@@ -1,5 +1,6 @@
 import subprocess
 import os
+import re
 
 
 def query_ollama(prompt, model):
@@ -18,12 +19,16 @@ def query_ollama(prompt, model):
 
     try:
         cmd = ["ollama", "run", model]
+        # Use explicit UTF-8 decoding and replace invalid bytes to avoid crashes on Windows
+        # and ensure we receive Python strings rather than raw bytes.
         process = subprocess.Popen(
             cmd,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
+            encoding="utf-8",
+            errors="replace",
         )
         # Allow configuring timeout via OLLAMA_TIMEOUT (seconds); default to 20s
         try:
@@ -43,7 +48,20 @@ def query_ollama(prompt, model):
                 " Try setting OLLAMA_MOCK=1 for development or check that the Ollama daemon is running."
             )
 
-        if err:
+        # Strip common ANSI escape sequences (cursor movements, color codes, etc.)
+        def strip_ansi(s: str) -> str:
+            if not s:
+                return s
+            # remove CSI and other ESC sequences
+            s = re.sub(r"\x1B\[[0-9;?]*[ -/]*[@-~]", "", s)
+            # remove leftover OSC / operating system commands
+            s = re.sub(r"\x1B\].*?\x07", "", s)
+            return s
+
+        out = strip_ansi(out)
+        err = strip_ansi(err)
+
+        if err and not out:
             return f"[Error from Ollama]\n{err.strip()}"
         return out.strip()
     except FileNotFoundError:
