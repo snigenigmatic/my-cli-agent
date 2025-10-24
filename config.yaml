@@ -1,0 +1,2 @@
+model: llama3:8b
+temperature: 0.3
