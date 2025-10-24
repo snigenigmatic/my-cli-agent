@@ -83,7 +83,9 @@ def main():
                     ".cc": "cpp",
                     ".cxx": "cpp",
                 }
-                lang = ext_map.get(ext, "python")  # Default to python for unknown extensions
+                lang = ext_map.get(
+                    ext, "python"
+                )  # Default to python for unknown extensions
                 console.print(f"[yellow]Running file {path} as {lang}...[/yellow]")
                 output = run_code(lang, code)
                 console.print("\n[bold blue]Program output:[/bold blue]")
@@ -108,7 +110,9 @@ def main():
                 elif len(parts) == 2:
                     # Check if parts[1] looks like a file path - if so, redirect to /runfile
                     if "/" in parts[1] or "\\" in parts[1] or "." in parts[1]:
-                        console.print(f"[yellow]Detected file path. Use /runfile {parts[1]} instead[/yellow]")
+                        console.print(
+                            f"[yellow]Detected file path. Use /runfile {parts[1]} instead[/yellow]"
+                        )
                         continue
                     lang = parts[1]
                 else:
